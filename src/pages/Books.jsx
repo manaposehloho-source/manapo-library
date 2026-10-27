@@ -6,7 +6,7 @@ import DataTable from '../components/DataTable.jsx';
 import { byTitle, isLowStock } from '../storage.js';
 
 export default function Books() {
-  const { books, setBooks, isAdmin, setEditingBookId, editingBookId, showToast } = useLibrary();
+  const { books, deleteBook, isAdmin, setEditingBookId, editingBookId, showToast } = useLibrary();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
@@ -30,12 +30,15 @@ export default function Books() {
     navigate('/forms');
   };
 
-  const remove = (book) => {
-    if (!window.confirm('Delete "' + book.title + '" from the catalogue? This cannot be undone.')) return;
-    setBooks(books.filter(b => b.id !== book.id));
-    if (editingBookId === book.id) setEditingBookId(null);
-    showToast('Book deleted.');
-  };
+  const remove = async (book) => {
+  if (!window.confirm(`Delete "${book.title}"?`)) return;
+
+  const success = await deleteBook(book.id);
+
+  if (success && String(editingBookId) === String(book.id)) {
+    setEditingBookId(null);
+  }
+};
 
   return (
     <section className="page">
